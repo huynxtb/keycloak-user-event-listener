@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+
+  postgresql_keycloakdb:
+    image: ${POSTGRES_IMAGE_NAME}
+    container_name: postgresql_keycloakdb
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - ${POSTGRES_DB_PORT}:5432
+    volumes:
+      - ./data/keycloakdb:/var/lib/postgresql/data
+    networks:
+      - keycloak_user_event_network
+
+  keycloak:
+    image: ${KEYCLOAK_IMAGE_NAME}
+    container_name: keycloak
+    restart: unless-stopped
+    command:
+      - start
+    volumes:
+      - ./providers:/opt/keycloak/providers
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: ${KEYCLOAK_PORT}
+      KC_HOSTNAME_STRICT_BACKCHANNEL: false
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgresql_keycloakdb/${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      WEBHOOK_URL: ${WEBHOOK_URL}
+    ports:
+      - ${KEYCLOAK_PORT}:8080
+    depends_on:
+      - postgresql_keycloakdb
+    networks:
+      - keycloak_user_event_network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    restart: unless-stopped
+    ports:
+      - ${MAILHOG_SMTP_PORT}:1025
+      - ${MAILHOG_WEB_UI}:8025
+    networks:
+      - keycloak_user_event_network
+
+networks:
+  keycloak_user_event_network:
