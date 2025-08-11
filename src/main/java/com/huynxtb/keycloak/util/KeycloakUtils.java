@@ -43,6 +43,7 @@ public final class KeycloakUtils {
         root.put("username", safe(user.getUsername()));
         root.put("email", safe(user.getEmail()));
         root.put("emailVerified", user.isEmailVerified());
+        root.put("enabled", user.isEnabled());
         root.put("ipAddress", ipAddress);
         Long createdTs = user.getCreatedTimestamp();
         if (createdTs != null) {

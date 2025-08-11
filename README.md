@@ -128,6 +128,7 @@ You can use services like [webhook.site](https://webhook.site) to test the webho
   "username": "admin",
   "email": "admin@gmail.com",
   "emailVerified": false,
+   "enabled": true,
   "ipAddress": "172.18.0.1",
   "createdTimestamp": 1753233395093,
   "roles": [
